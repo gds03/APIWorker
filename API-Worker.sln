@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{A138134B-E481-4E1B-871F-86FBC7230017}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Worker", "Worker\Worker.csproj", "{B76A003F-E714-4169-BC86-01B6CC310502}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Contracts.csproj", "{40792F55-C7B9-411E-8D24-F7C95F504511}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A4161ABB-0C1C-4125-9127-411A551F65F6}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+		dockerfile.api = dockerfile.api
+		dockerfile.worker = dockerfile.worker
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A138134B-E481-4E1B-871F-86FBC7230017}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A138134B-E481-4E1B-871F-86FBC7230017}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A138134B-E481-4E1B-871F-86FBC7230017}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A138134B-E481-4E1B-871F-86FBC7230017}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B76A003F-E714-4169-BC86-01B6CC310502}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B76A003F-E714-4169-BC86-01B6CC310502}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B76A003F-E714-4169-BC86-01B6CC310502}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{B76A003F-E714-4169-BC86-01B6CC310502}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{40792F55-C7B9-411E-8D24-F7C95F504511}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40792F55-C7B9-411E-8D24-F7C95F504511}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40792F55-C7B9-411E-8D24-F7C95F504511}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40792F55-C7B9-411E-8D24-F7C95F504511}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

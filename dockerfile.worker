@@ -1,0 +1,25 @@
+# Use official .NET 8 SDK to build the app
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
+WORKDIR /app
+
+# Copy solution and project files
+COPY *.sln ./
+COPY Contracts/*.csproj Contracts/
+COPY API/*.csproj API/
+COPY Worker/*.csproj Worker/
+
+# Restore dependencies
+RUN dotnet restore
+
+# Copy the entire source code
+COPY . .
+
+# Build API project
+RUN dotnet publish Worker/Worker.csproj -c Release -o /out
+
+# Use a smaller runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+COPY --from=build /out ./
+ENTRYPOINT ["dotnet", "Worker.dll"]

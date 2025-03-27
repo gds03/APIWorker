@@ -1,0 +1,34 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"   # RabbitMQ AMQP
+      - "15672:15672" # RabbitMQ Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+
+  api:
+    build:
+      context: .
+      dockerfile: dockerfile.api
+    depends_on:
+      - rabbitmq
+    ports:
+      - "5000:5000"
+    environment:
+      RABBITMQ:Host: rabbitmq
+      RABBITMQ:User: user
+      RABBITMQ:Password: password
+
+  worker:
+    build:
+      context: .
+      dockerfile: dockerfile.worker
+    depends_on:
+      - rabbitmq
+    environment:
+      RABBITMQ:Host: rabbitmq
+      RABBITMQ:User: user
+      RABBITMQ:Password: password

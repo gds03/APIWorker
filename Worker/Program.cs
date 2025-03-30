@@ -1,9 +1,10 @@
 ﻿// WorkerService/Program.cs
+using System;
+using System.Threading.Tasks;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Threading.Tasks;
+using Worker;
 
 
 var configuration = new ConfigurationBuilder()

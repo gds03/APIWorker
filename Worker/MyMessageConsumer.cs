@@ -1,6 +1,8 @@
 using Contracts;
 using MassTransit;
 
+namespace Worker;
+
 public class MyMessageConsumer : IConsumer<SendMessage>
 {
     public Task Consume(ConsumeContext<SendMessage> context)

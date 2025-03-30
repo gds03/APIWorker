@@ -14,6 +14,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{B337EF88-9C96-4561-A475-AED271645CCD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.Tests", "Domain.Tests\Domain.Tests.csproj", "{74E76BDE-3CE3-430F-A4FD-5789A5897FB8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,5 +36,15 @@ Global
 		{40792F55-C7B9-411E-8D24-F7C95F504511}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{40792F55-C7B9-411E-8D24-F7C95F504511}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{40792F55-C7B9-411E-8D24-F7C95F504511}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B337EF88-9C96-4561-A475-AED271645CCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B337EF88-9C96-4561-A475-AED271645CCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B337EF88-9C96-4561-A475-AED271645CCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B337EF88-9C96-4561-A475-AED271645CCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74E76BDE-3CE3-430F-A4FD-5789A5897FB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74E76BDE-3CE3-430F-A4FD-5789A5897FB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74E76BDE-3CE3-430F-A4FD-5789A5897FB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74E76BDE-3CE3-430F-A4FD-5789A5897FB8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 EndGlobal

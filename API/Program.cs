@@ -1,10 +1,12 @@
 ﻿// ApiService/Program.cs
 using API.Infrastructure.Extensions;
 using Contracts;
+using Domain.Database;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -33,6 +35,15 @@ builder.Services.AddMassTransit(x =>
             h.Password(rabbitPass);
         });
     });
+});
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    var dbHost = configuration["DATABASE:Host"] ?? "localhost";
+    var dbName = configuration["DATABASE:Name"] ?? "guestDb";
+    var dbUser = configuration["DATABASE:User"] ?? "guest";
+    var dbPass = configuration["DATABASE:Password"] ?? "guest";
+
+    options.UseMySQL($"Server={dbHost};Port=3306;Database={dbName};User={dbUser};Password={dbPass};");
 });
 
 builder.Services.AddHandlers();

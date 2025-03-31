@@ -1,7 +1,9 @@
 using API.Infrastructure;
+using Domain.Database;
 using Domain.ValueObjects.Account;
 using FluentResults;
 using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace API.Features.Orders.GetOrders;
@@ -27,9 +29,9 @@ public record GetOrdersHandlerResponse(AccountId AccountId, List<GetOrdersHandle
 
 public class GetOrdersHandlerOrderResponse
 {
-    public string Status { get; }
-    public DateTime UtcPlacedAt { get; set; }
-    public decimal Price { get; set; }
+    public string Status { get; init; }
+    public DateTime UtcPlacedAt { get; init;}
+    public decimal Price { get;init; }
 }
 
 public interface IGetOrdersHandler : IHandler
@@ -40,17 +42,26 @@ public interface IGetOrdersHandler : IHandler
 public class GetOrdersHandler : IGetOrdersHandler
 {
     private readonly ILogger<GetOrdersHandler> _logger;
+    private readonly AppDbContext _dbContext;
     private readonly IBus _bus;
 
-    public GetOrdersHandler(ILogger<GetOrdersHandler> logger, IBus bus)
+    public GetOrdersHandler(ILogger<GetOrdersHandler> logger, AppDbContext dbContext, IBus bus)
     {
         _logger = logger;
+        _dbContext = dbContext;
         _bus = bus;
     }
 
     public async Task<GetOrdersHandlerResponse> HandleAsync(GetOrdersHandlerRequest request, CancellationToken cancellationToken)
     {
+        var orders = await _dbContext.Orders.ToListAsync(cancellationToken);
+        
         // go to the db and read the orders for this account.
-        return new(request.AccountId, new List<GetOrdersHandlerOrderResponse>());
+        return new(request.AccountId, orders.Select(x => new GetOrdersHandlerOrderResponse
+        {
+            Status = x.Status,
+            Price = x.Price,
+            UtcPlacedAt = x.CreatedWhenUtc
+        }).ToList());
     }
 }

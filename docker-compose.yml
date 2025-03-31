@@ -8,7 +8,19 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: user
       RABBITMQ_DEFAULT_PASS: password
-
+  mysql:
+    image: mysql:8
+    container_name: mysqldb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: APIWorker
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
   api:
     build:
       context: .
@@ -21,7 +33,10 @@ services:
       RABBITMQ:Host: rabbitmq
       RABBITMQ:User: user
       RABBITMQ:Password: password
-
+      DATABASE:Host: mysql
+      DATABASE:Name: APIWorker
+      DATABASE:User: APIWorkerUser
+      DATABASE:Password: APIWorkerUserPassword
   worker:
     build:
       context: .
@@ -32,3 +47,10 @@ services:
       RABBITMQ:Host: rabbitmq
       RABBITMQ:User: user
       RABBITMQ:Password: password
+      DATABASE:Host: mysql
+      DATABASE:Name: APIWorker
+      DATABASE:User: APIWorkerUser
+      DATABASE:Password: APIWorkerUserPassword
+
+volumes:   
+  mysql_data:

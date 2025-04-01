@@ -1,18 +1,18 @@
-using Domain.ValueObjects.Orders;
+using Domain.ValueObjects.Payment;
 
-namespace Domain.Tests.ValueObjects.Order;
+namespace Domain.Tests.ValueObjects.Payment;
 
-public class OrderStatusTests
+public class PaymentStatusTests
 {
     [Theory]
-    [InlineData(OrderStatusEnum.Pending, "Pending")]
-    [InlineData(OrderStatusEnum.PaymentReceived, "PaymentReceived")]
-    [InlineData(OrderStatusEnum.PaymentRejected, "PaymentRejected")]
-    [InlineData(OrderStatusEnum.Payed, "Payed")]
-    public void Create_ValidOrderStatusEnum_ReturnsCorrectValue(OrderStatusEnum orderStatusEnum, string expectedString)
+    [InlineData(PaymentStatusEnum.Pending, "Pending")]
+    [InlineData(PaymentStatusEnum.PaymentReceived, "PaymentReceived")]
+    [InlineData(PaymentStatusEnum.PaymentRejected, "PaymentRejected")]
+    [InlineData(PaymentStatusEnum.Payed, "Payed")]
+    public void Create_ValidOrderStatusEnum_ReturnsCorrectValue(PaymentStatusEnum paymentStatusEnum, string expectedString)
     {
         // Act
-        var orderStatus = new OrderStatus(orderStatusEnum);
+        var orderStatus = new PaymentStatus(paymentStatusEnum);
 
         // Assert
         Assert.Equal(expectedString, orderStatus.Value);
@@ -22,8 +22,8 @@ public class OrderStatusTests
     public void Equals_SameValue_ReturnsTrue()
     {
         // Arrange
-        var status1 = new OrderStatus(OrderStatusEnum.Pending);
-        var status2 = new OrderStatus(OrderStatusEnum.Pending);
+        var status1 = new PaymentStatus(PaymentStatusEnum.Pending);
+        var status2 = new PaymentStatus(PaymentStatusEnum.Pending);
 
         // Act & Assert
         Assert.Equal(status1, status2);
@@ -35,8 +35,8 @@ public class OrderStatusTests
     public void Equals_DifferentValue_ReturnsFalse()
     {
         // Arrange
-        var status1 = new OrderStatus(OrderStatusEnum.Pending);
-        var status2 = new OrderStatus(OrderStatusEnum.Payed);
+        var status1 = new PaymentStatus(PaymentStatusEnum.Pending);
+        var status2 = new PaymentStatus(PaymentStatusEnum.Payed);
 
         // Act & Assert
         Assert.NotEqual(status1, status2);
@@ -48,7 +48,7 @@ public class OrderStatusTests
     public void ImplicitConversion_ToString_ReturnsValue()
     {
         // Arrange
-        var orderStatus = new OrderStatus(OrderStatusEnum.PaymentReceived);
+        var orderStatus = new PaymentStatus(PaymentStatusEnum.PaymentReceived);
 
         // Act
         string stringValue = orderStatus;
@@ -61,7 +61,7 @@ public class OrderStatusTests
     public void ToString_ReturnsExpectedValue()
     {
         // Arrange
-        var orderStatus = new OrderStatus(OrderStatusEnum.PaymentRejected);
+        var orderStatus = new PaymentStatus(PaymentStatusEnum.PaymentRejected);
 
         // Act & Assert
         Assert.Equal("PaymentRejected", orderStatus.ToString());

@@ -1,6 +1,6 @@
-using Domain.ValueObjects.Products;
+using Domain.ValueObjects.Product;
 
-namespace Domain.Tests.ValueObjects.Products;
+namespace Domain.Tests.ValueObjects.Product;
 
 public class SkuTests
 {

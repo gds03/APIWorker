@@ -1,3 +1,6 @@
+using API.Features.Orders;
+using API.Features.Orders.PlaceOrder;
+using API.HttpClients;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace API.Infrastructure.Extensions;
@@ -15,5 +18,11 @@ public static class ServicesCollectionExtensions
         
         return services;
     }
-    
+
+    public static IServiceCollection AddHttpClients(this IServiceCollection services)
+    {
+        services.AddTransient<IPriceHttpClient, PriceHttpClient>();
+        services.AddSingleton<IOrderIdentifierGenerator, OrderIdentifierGenerator>();
+        return services;
+    }
 }

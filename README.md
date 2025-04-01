@@ -10,6 +10,8 @@ The example here to be shown is that a Order is placed, and once the order is pl
 
 # Docker:
 
+docker-compose up
+
 docker rm -v -f $(docker ps -qa)
 
 docker run -d --name rabbitmq_unit \
@@ -38,3 +40,4 @@ dotnet ef migrations add InitialCreate --project Domain --startup-project API
 dotnet ef database update --project Domain --startup-project API
 
 
+dotnet ef database update --project Domain --startup-project API --connection "Server=localhost;Port=3306;Database=APIWorker;User=myuser;Password=mypassword"

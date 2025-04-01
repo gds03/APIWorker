@@ -1,7 +1,7 @@
 using Domain.Infrastructure;
 using FluentResults;
 
-namespace Domain.ValueObjects.Products;
+namespace Domain.ValueObjects.Product;
 
 
 public readonly record struct Sku

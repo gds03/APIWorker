@@ -1,11 +1,11 @@
-namespace Domain.ValueObjects.Orders;
+namespace Domain.ValueObjects.Order;
 
 public enum OrderStatusEnum
 {
-    Pending,
-    PaymentReceived,
-    PaymentRejected,
-    Payed
+    WaitingForPayment,
+    WaitingForDispatched,
+    Dispatched,
+    Delivered
 }
 
 public readonly record struct OrderStatus
@@ -14,6 +14,7 @@ public readonly record struct OrderStatus
 
     public OrderStatus(OrderStatusEnum orderStatus) => Value = orderStatus.ToString();
 
+    public static implicit operator OrderStatus(string orderStatus) => new OrderStatus(Enum.Parse<OrderStatusEnum>(orderStatus));
     public static implicit operator string(OrderStatus orderStatus) => orderStatus.Value;
     public override string ToString() => Value;
 }

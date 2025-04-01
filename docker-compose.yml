@@ -35,8 +35,8 @@ services:
       RABBITMQ:Password: password
       DATABASE:Host: mysql
       DATABASE:Name: APIWorker
-      DATABASE:User: APIWorkerUser
-      DATABASE:Password: APIWorkerUserPassword
+      DATABASE:User: myuser
+      DATABASE:Password: mypassword
   worker:
     build:
       context: .
@@ -49,8 +49,8 @@ services:
       RABBITMQ:Password: password
       DATABASE:Host: mysql
       DATABASE:Name: APIWorker
-      DATABASE:User: APIWorkerUser
-      DATABASE:Password: APIWorkerUserPassword
+      DATABASE:User: myuser
+      DATABASE:Password: mypassword
 
 volumes:   
   mysql_data:

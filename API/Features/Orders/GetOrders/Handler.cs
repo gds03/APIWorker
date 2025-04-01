@@ -31,7 +31,7 @@ public class GetOrdersHandlerOrderResponse
 {
     public string Status { get; init; }
     public DateTime UtcPlacedAt { get; init;}
-    public decimal Price { get;init; }
+    public decimal Total { get;init; }
 }
 
 public interface IGetOrdersHandler : IHandler
@@ -60,7 +60,7 @@ public class GetOrdersHandler : IGetOrdersHandler
         return new(request.AccountId, orders.Select(x => new GetOrdersHandlerOrderResponse
         {
             Status = x.Status,
-            Price = x.Price,
+            Total = x.Total,
             UtcPlacedAt = x.CreatedWhenUtc
         }).ToList());
     }

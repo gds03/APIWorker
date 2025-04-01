@@ -46,6 +46,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySQL($"Server={dbHost};Port=3306;Database={dbName};User={dbUser};Password={dbPass};");
 });
 
+builder.Services.AddHttpClients();
 builder.Services.AddHandlers();
 builder.Services.AddRouting();
 builder.Services.AddControllers(options => {

@@ -8,7 +8,7 @@ namespace API.Infrastructure.Extensions;
 public static class WebApplicationExtensions
 {
     
-    public static Task EnsureDbIsReadyAsync(this WebApplication webApplication)
+    public static void EnsureDbIsReady(this WebApplication webApplication)
     {
         using var scope = webApplication.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -24,6 +24,6 @@ public static class WebApplicationExtensions
             dbContext.Products.AddRange(ProductSeed.Products);
         }
 
-        return dbContext.SaveChangesAsync();
+        dbContext.SaveChanges();
     }
 }

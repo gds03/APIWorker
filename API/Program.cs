@@ -21,9 +21,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMassTransit(x =>
 {
+    x.SetKebabCaseEndpointNameFormatter();
     x.AddEntityFrameworkOutbox<AppDbContext>(o =>
     {
-        //o.QueryDelay = TimeSpan.FromDays(1);
+        // o.QueryDelay = TimeSpan.FromDays(1);
         o.UseMySql();
         o.UseBusOutbox();
     });
@@ -67,7 +68,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.WebHost.UseUrls("http://0.0.0.0:5000"); // Ensure API listens on all interfaces
 
 var app = builder.Build();
-await app.EnsureDbIsReadyAsync();
+app.EnsureDbIsReady();
 
 // Enable Swagger UI in development
 if (app.Environment.IsDevelopment())

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Worker;
+using Worker.Consumers;
 
 
 var configuration = new ConfigurationBuilder()
@@ -18,14 +19,21 @@ var configuration = new ConfigurationBuilder()
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
     {
+        services.AddDbContext<AppDbContext>(options =>
+        {
+            var dbHost = configuration["DATABASE:Host"] ?? "localhost";
+            var dbName = configuration["DATABASE:Name"] ?? "guestDb";
+            var dbUser = configuration["DATABASE:User"] ?? "guest";
+            var dbPass = configuration["DATABASE:Password"] ?? "guest";
+
+            options.UseMySQL($"Server={dbHost};Port=3306;Database={dbName};User={dbUser};Password={dbPass};");
+        });
         services.AddMassTransit(x =>
         {
-            x.AddEntityFrameworkOutbox<AppDbContext>(o =>
-            {
-                o.UseMySql();
-                o.UseBusOutbox();
-            });
-            x.AddConfigureEndpointsCallback((context, name, cfg) => { cfg.UseEntityFrameworkOutbox<AppDbContext>(context); });
+            x.SetKebabCaseEndpointNameFormatter();
+            
+            x.AddConsumer<OrderPlacedConsumer>();
+            
             x.UsingRabbitMq((context, cfg) =>
             {
                 var rabbitHost = configuration["RABBITMQ:Host"] ?? "localhost";
@@ -38,23 +46,12 @@ var host = Host.CreateDefaultBuilder(args)
                     h.Password(rabbitPass);
                 });
 
-                cfg.ReceiveEndpoint("my-queue", e =>
-                {
-                    e.ConfigureConsumer<MyMessageConsumer>(context);
-                });
+                cfg.ConfigureEndpoints(context);
             });
-            x.AddConsumer<MyMessageConsumer>();
+            
         });
         
-        services.AddDbContext<AppDbContext>(options =>
-        {
-            var dbHost = configuration["DATABASE:Host"] ?? "localhost";
-            var dbName = configuration["DATABASE:Name"] ?? "guestDb";
-            var dbUser = configuration["DATABASE:User"] ?? "guest";
-            var dbPass = configuration["DATABASE:Password"] ?? "guest";
-
-            options.UseMySQL($"Server={dbHost};Port=3306;Database={dbName};User={dbUser};Password={dbPass};");
-        });
+        
     })
     .Build();
 

@@ -98,6 +98,8 @@ public class PlaceOrderHandler : IPlaceOrderHandler
 
     public async Task<OneOf<(OrderIdentifier identifier, OrderStatus orderStatus), Error>> HandleAsync(PlaceOrderHandlerRequest request, CancellationToken cancellationToken)
     {
+        using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+
         // Outbox pattern now.
         var skus = request.Products.Select(x => x.sku.ToString()).ToArray();
 
@@ -147,18 +149,23 @@ public class PlaceOrderHandler : IPlaceOrderHandler
             Name = request.VisaCard.Owner            
         };
         
+        _dbContext.Orders.Add(o);
+        _dbContext.Payments.Add(p);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        await SendEventAsync(cancellationToken, o, p);
+        await transaction.CommitAsync(cancellationToken);
+
+        return (orderIdentifier, o.Status);
+    }
+
+    private async Task SendEventAsync(CancellationToken cancellationToken, Order o, CardPayment p)
+    {
         OrderPlaced orderPlaced = new(
             new OrderInfo(o.AccountId, DateTime.UtcNow, o.Identifier, o.Total, o.Status),
             new PaymentInfo(p.Status, p.PaymentType, p.Price, p.CardNumber, p.Month, p.Year, p.CVV, p.Name)
         );
 
         await _bus.Publish(orderPlaced, cancellationToken);
-        
-        _dbContext.Orders.Add(o);
-        _dbContext.Payments.Add(p);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        
-        return (orderIdentifier, o.Status);
     }
 }
 

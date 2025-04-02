@@ -40,6 +40,14 @@ public class AppDbContext : DbContext
         b.Entity<Order>()
             .HasMany(o => o.Products)
             .WithMany(p => p.Orders);
+        
+        
+        // Payment
+        b.Entity<Payment>()
+            .HasDiscriminator<string>("PaymentType")
+            .HasValue<CardPayment>("Card")
+            .HasValue<PayPalPayment>("PayPal")
+            .HasValue<CryptoPayment>("Crypto");
 
         b.Entity<Account>().HasData(Seed.Accounts.GetAccounts());
         b.Entity<Product>().HasData(Seed.Products.GetProducts());

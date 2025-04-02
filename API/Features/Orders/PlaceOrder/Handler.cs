@@ -110,10 +110,10 @@ public class PlaceOrderHandler : IPlaceOrderHandler
             Status = new OrderStatus(OrderStatusEnum.WaitingForPayment),
             Identifier = orderGenId,
             Products = products,
-            Payment = new Payment
-            {
-                
-            }
+            // Payment = new Payment
+            // {
+            //     
+            // }
         };
         
         return (order.Id, order.Status);

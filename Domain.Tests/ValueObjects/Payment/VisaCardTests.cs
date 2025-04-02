@@ -11,7 +11,7 @@ public class VisaCardTests
         string validCardNumber = "4111111111111111";
         int validExpirationMonth = 12;
         int validExpirationYear = 2025;
-        string validCVV = "123";
+        int validCVV = 12;
 
         // Act
         var result = VisaCard.Create(validCardNumber, validExpirationMonth, validExpirationYear, validCVV);
@@ -31,7 +31,7 @@ public class VisaCardTests
         string invalidCardNumber = "1234567890123456";
         int validExpirationMonth = 12;
         int validExpirationYear = 2025;
-        string validCVV = "123";
+        int validCVV = 1;
 
         // Act
         var result = VisaCard.Create(invalidCardNumber, validExpirationMonth, validExpirationYear, validCVV);
@@ -48,7 +48,7 @@ public class VisaCardTests
         string validCardNumber = "4111111111111111";
         int expiredMonth = 1;
         int expiredYear = 2020;
-        string validCVV = "123";
+        int validCVV = 123;
 
         // Act
         var result = VisaCard.Create(validCardNumber, expiredMonth, expiredYear, validCVV);
@@ -65,7 +65,7 @@ public class VisaCardTests
         string validCardNumber = "4111111111111111";
         int validExpirationMonth = 12;
         int validExpirationYear = 2025;
-        string invalidCVV = "12"; // Invalid CVV
+        int invalidCVV = 1234; // Invalid CVV
 
         // Act
         var result = VisaCard.Create(validCardNumber, validExpirationMonth, validExpirationYear, invalidCVV);
@@ -82,7 +82,7 @@ public class VisaCardTests
         string invalidCardNumber = "";
         int validExpirationMonth = 12;
         int validExpirationYear = 2025;
-        string validCVV = "123";
+        int validCVV = 123;
 
         // Act
         var result = VisaCard.Create(invalidCardNumber, validExpirationMonth, validExpirationYear, validCVV);
@@ -99,7 +99,7 @@ public class VisaCardTests
         string? invalidCardNumber = null;
         int validExpirationMonth = 12;
         int validExpirationYear = 2025;
-        string validCVV = "123";
+        int validCVV = 123;
 
         // Act
         var result = VisaCard.Create(invalidCardNumber, validExpirationMonth, validExpirationYear, validCVV);
@@ -116,7 +116,7 @@ public class VisaCardTests
         string invalidCardNumber = "4111111111111112"; // Luhn check fails
         int validExpirationMonth = 12;
         int validExpirationYear = 2025;
-        string validCVV = "123";
+        int validCVV = 123;
 
         // Act
         var result = VisaCard.Create(invalidCardNumber, validExpirationMonth, validExpirationYear, validCVV);
@@ -133,7 +133,7 @@ public class VisaCardTests
         string validCardNumber = "378282246310005"; // American Express card
         int validExpirationMonth = 12;
         int validExpirationYear = 2025;
-        string validCVV = "1234"; // Amex uses a 4-digit CVV
+        int validCVV = 1234; // Amex uses a 4-digit CVV
 
         // Act
         var result = VisaCard.Create(validCardNumber, validExpirationMonth, validExpirationYear, validCVV);

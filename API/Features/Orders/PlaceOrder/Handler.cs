@@ -27,7 +27,7 @@ public class PlaceOrderHandlerRequest
     public static Result<PlaceOrderHandlerRequest> Create(
         string? accountId, 
         IEnumerable<(string? sku, int amount)> products,
-        (string? cardNumber, int ExpirationMonth,  int ExpirationYear, string Cvv) visaCard
+        (string? cardNumber, int expirationMonth, int expirationYear, int cvv) visaCard
         )
     {
         List<Result> results = [];
@@ -50,8 +50,8 @@ public class PlaceOrderHandlerRequest
         }
         
         // VISA
-        var voVisaCard = VisaCard.Create(visaCard.cardNumber, visaCard.ExpirationMonth, visaCard.ExpirationYear,
-            visaCard.Cvv);
+        var voVisaCard = VisaCard.Create(visaCard.cardNumber, visaCard.expirationMonth, visaCard.expirationYear,
+            visaCard.cvv);
         results.Add(voVisaCard.ToResult());
         
         var mergedResult = Result.Merge(results.ToResult());
@@ -117,6 +117,15 @@ public class PlaceOrderHandler : IPlaceOrderHandler
             return new Error(string.Join(Environment.NewLine, Result.Merge(productsValidationErrors.ToResult()).Errors.Select(x => x.Message)));
         }
 
+        var payment = new CardPayment
+        {
+            CardNumber = request.VisaCard.CardNumber,
+            Month = request.VisaCard.ExpirationMonth,
+            Year = request.VisaCard.ExpirationYear,
+            CVV = request.VisaCard.Cvv,
+            //Name = request.VisaCard.Name
+        };
+
         var totalProductPrice = products.Sum(p => _priceHttpClient.GetPriceAsync(p.Sku).Result);
         var orderGenId = _orderIdentifierGenerator.Generate();
         var order = new Order
@@ -125,11 +134,7 @@ public class PlaceOrderHandler : IPlaceOrderHandler
             Total = totalProductPrice,
             Status = new OrderStatus(OrderStatusEnum.WaitingForPayment),
             Identifier = orderGenId,
-            Products = products,
-            Payment = new CardPayment()
-            {
-                
-            }
+            Products = products
         };
         
         return (order.Id, order.Status);

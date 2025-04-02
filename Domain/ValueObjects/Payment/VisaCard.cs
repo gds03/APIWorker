@@ -7,9 +7,9 @@ public readonly record struct VisaCard
     public string CardNumber { get; }
     public int ExpirationMonth { get; }
     public int ExpirationYear { get; }
-    public string Cvv { get; }
+    public int Cvv { get; }
 
-    private VisaCard(string cardNumber, int expirationMonth, int expirationYear, string cvv)
+    private VisaCard(string cardNumber, int expirationMonth, int expirationYear, int cvv)
     {
         CardNumber = cardNumber;
         ExpirationMonth = expirationMonth;
@@ -21,7 +21,7 @@ public readonly record struct VisaCard
 
     public override string ToString() => CardNumber;
 
-    public static Result<VisaCard> Create(string? cardNumber, int? expirationMonth, int? expirationYear, string? cvv)
+    public static Result<VisaCard> Create(string? cardNumber, int? expirationMonth, int? expirationYear, int? cvv)
     {
         List<Error> errors = new();
         if (!expirationMonth.HasValue || !expirationYear.HasValue || !IsValidExpiration(expirationMonth.Value, expirationYear.Value))
@@ -29,7 +29,7 @@ public readonly record struct VisaCard
             errors.Add("Expiration date is invalid.");
         }
         
-        if (string.IsNullOrWhiteSpace(cvv) || (!string.IsNullOrWhiteSpace(cardNumber) && !IsValidCVV(cvv, cardNumber)))
+        if (cvv is null or < 1 or > 999)
         {
             errors.Add("CVV code is invalid.");
         }
@@ -55,7 +55,7 @@ public readonly record struct VisaCard
             return Result.Fail<VisaCard>(errors.Select(e => e.ToString()));
         }
 
-        return Result.Ok(new VisaCard(cardNumber!, expirationMonth!.Value, expirationYear!.Value, cvv!));
+        return Result.Ok(new VisaCard(cardNumber!, expirationMonth!.Value, expirationYear!.Value, cvv!.Value));
     }
     
     private static bool IsValidExpiration(int cardMonth, int cardYear)
@@ -71,17 +71,6 @@ public readonly record struct VisaCard
             return true;
 
         return false;
-    }
-    
-    private static bool IsValidCVV(string cvv, string cardNumber)
-    {
-        // American Express cards have a 4-digit CVV, others have a 3-digit CVV
-        if (cardNumber.Length == 15 && cvv.Length == 4) // American Express
-        {
-            return int.TryParse(cvv, out _);
-        }
-
-        return cvv.Length == 3 && int.TryParse(cvv, out _); // Visa/MasterCard/Other cards
     }
     
     private static bool IsLuhnValid(string cardNumber)

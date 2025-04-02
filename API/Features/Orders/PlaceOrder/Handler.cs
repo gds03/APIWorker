@@ -1,4 +1,3 @@
-using API.Features._Shared.Handlers;
 using API.HttpClients;
 using API.Infrastructure;
 using Domain.Database;
@@ -6,6 +5,7 @@ using Domain.Database.Entities;
 using Domain.ValueObjects;
 using Domain.ValueObjects.Account;
 using Domain.ValueObjects.Order;
+using Domain.ValueObjects.Payment;
 using Domain.ValueObjects.Product;
 using FluentResults;
 using MassTransit;
@@ -22,14 +22,16 @@ public class PlaceOrderHandlerRequest
     public AccountId AccountId { get; private set; }
     public IEnumerable<(Sku sku, BigInt amount)> Products{ get; private set; } = null!;
 
+    public VisaCard VisaCard { get; private set; }
+
     public static Result<PlaceOrderHandlerRequest> Create(
         string? accountId, 
         IEnumerable<(string? sku, int amount)> products,
-        VisaCardPaymentRequest visaCardPaymentRequest
+        (string? cardNumber, int ExpirationMonth,  int ExpirationYear, string Cvv) visaCard
         )
     {
         List<Result> results = [];
-        Result<AccountId> voAccountId = AccountId.Create(accountId);
+        var voAccountId = AccountId.Create(accountId);
         results.Add(voAccountId.ToResult());
 
         var validatedProducts = new List<(Sku, BigInt)>();
@@ -45,7 +47,13 @@ public class PlaceOrderHandlerRequest
             {
                 validatedProducts.Add((voSku.Value, voAmount.Value));
             }
-        } 
+        }
+        
+        // VISA
+        var voVisaCard = VisaCard.Create(visaCard.cardNumber, visaCard.ExpirationMonth, visaCard.ExpirationYear,
+            visaCard.Cvv);
+        results.Add(voVisaCard.ToResult());
+        
         var mergedResult = Result.Merge(results.ToResult());
         if (mergedResult.IsFailed)
         {
@@ -55,7 +63,8 @@ public class PlaceOrderHandlerRequest
         return Result.Ok(new PlaceOrderHandlerRequest
         {
             AccountId = voAccountId.Value,
-            Products = validatedProducts
+            Products = validatedProducts,
+            VisaCard = voVisaCard.Value,
         });
     }
 }

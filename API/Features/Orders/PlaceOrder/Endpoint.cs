@@ -1,5 +1,4 @@
 using API.Features._Shared.Endpoints;
-using API.Features._Shared.Handlers;
 using API.Features.Orders.GetOrders;
 using API.Infrastructure.Hypermedia;
 using Domain.ValueObjects;
@@ -26,11 +25,9 @@ public class PlaceOrderEndpoint : Controller
         var handlerRequest = PlaceOrderHandlerRequest.Create(
             accountId, 
             request.Products.Select(p => (p.Sku, p.Amount)),
-            new VisaCardPaymentRequest
-            {
-                
-            }
-            );
+            (request.VisaPayment.CardNumber, request.VisaPayment.ExpirationMonth, request.VisaPayment.ExpirationYear, request.VisaPayment.Cvv)
+        );
+        
         if (handlerRequest.IsFailed)
         {
             return BadRequest(handlerRequest.Errors);
@@ -56,6 +53,7 @@ public class PlaceOrderEndpoint : Controller
 
 public class PlaceOrderRequest
 {
+    public VisaCardPaymentRequest VisaPayment { get; set; }
     public List<ProductAmountRequest> Products { get; set; } = [];
 }
 public record PlaceOrderResponse(long OrderIdentifier, string OrderStatus) : ApiResponse;

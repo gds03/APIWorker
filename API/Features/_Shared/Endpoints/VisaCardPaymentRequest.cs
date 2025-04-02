@@ -1,4 +1,4 @@
-namespace API.Features._Shared.Handlers;
+namespace API.Features._Shared.Endpoints;
 
 public class VisaCardPaymentRequest
 {

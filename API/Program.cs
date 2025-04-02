@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
 var configuration = new ConfigurationBuilder()
@@ -18,13 +19,10 @@ var configuration = new ConfigurationBuilder()
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Services.AddMassTransit(x =>
 {
-    x.SetKebabCaseEndpointNameFormatter();
     x.AddEntityFrameworkOutbox<AppDbContext>(o =>
     {
-        // o.QueryDelay = TimeSpan.FromDays(1);
         o.UseMySql();
         o.UseBusOutbox();
     });
@@ -40,8 +38,12 @@ builder.Services.AddMassTransit(x =>
             h.Username(rabbitUser);
             h.Password(rabbitPass);
         });
+        
+        cfg.ConfigureEndpoints(context);
     });
 });
+
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     var dbHost = configuration["DATABASE:Host"] ?? "localhost";
@@ -64,6 +66,7 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
 });
 
+builder.Logging.AddFilter("MassTransit", LogLevel.Debug);
 
 builder.WebHost.UseUrls("http://0.0.0.0:5000"); // Ensure API listens on all interfaces
 

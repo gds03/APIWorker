@@ -77,14 +77,14 @@ public class PlaceOrderHandler : IPlaceOrderHandler
 {
     private readonly ILogger<PlaceOrderHandler> _logger;
     private readonly AppDbContext _dbContext;
-    private readonly IBus _bus;
+    private readonly IPublishEndpoint _bus;
     private readonly IPriceHttpClient _priceHttpClient;
     private readonly IOrderIdentifierGenerator _orderIdentifierGenerator;
 
     public PlaceOrderHandler(
         ILogger<PlaceOrderHandler> logger,
         AppDbContext dbContext,
-        IBus bus,
+        IPublishEndpoint bus,
         IPriceHttpClient priceHttpClient,
         IOrderIdentifierGenerator orderIdentifierGenerator
     )
@@ -99,7 +99,7 @@ public class PlaceOrderHandler : IPlaceOrderHandler
     public async Task<OneOf<(OrderIdentifier identifier, OrderStatus orderStatus), Error>> HandleAsync(PlaceOrderHandlerRequest request, CancellationToken cancellationToken)
     {
         using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
-
+        
         // Outbox pattern now.
         var skus = request.Products.Select(x => x.sku.ToString()).ToArray();
 
@@ -153,7 +153,7 @@ public class PlaceOrderHandler : IPlaceOrderHandler
         _dbContext.Payments.Add(p);
         await _dbContext.SaveChangesAsync(cancellationToken);
         await SendEventAsync(cancellationToken, o, p);
-        await transaction.CommitAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken); // ✅ Ensures DB & Message are in sync
 
         return (orderIdentifier, o.Status);
     }

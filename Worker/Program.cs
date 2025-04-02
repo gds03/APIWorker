@@ -30,8 +30,6 @@ var host = Host.CreateDefaultBuilder(args)
         });
         services.AddMassTransit(x =>
         {
-            x.SetKebabCaseEndpointNameFormatter();
-            
             x.AddConsumer<OrderPlacedConsumer>();
             
             x.UsingRabbitMq((context, cfg) =>
@@ -47,8 +45,7 @@ var host = Host.CreateDefaultBuilder(args)
                 });
 
                 cfg.ConfigureEndpoints(context);
-            });
-            
+            });            
         });
         
         

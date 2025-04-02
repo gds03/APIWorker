@@ -1,6 +1,7 @@
 using API.HttpClients;
 using API.Infrastructure;
 using Domain.Database;
+using Domain.Database.Entities;
 using Domain.ValueObjects;
 using Domain.ValueObjects.Account;
 using Domain.ValueObjects.Order;

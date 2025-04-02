@@ -1,3 +1,5 @@
+using Domain.Database.Entities;
+
 namespace Domain.Database;
 
 using Microsoft.EntityFrameworkCore;
@@ -19,26 +21,28 @@ public class AppDbContext : DbContext
     {        
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder b)
     {
         // Orders
         // Order-Account 1:1 - Account-Order:1-N
-        modelBuilder.Entity<Order>()
+        b.Entity<Order>()
             .HasOne(o => o.Account)
             .WithMany(a => a.Orders)
             .HasForeignKey(o => o.AccountId);
         
         // Order to payment 1:1
-        modelBuilder.Entity<Order>()
+        b.Entity<Order>()
             .HasOne(o => o.Payment)
             .WithOne(p => p.Order)
             .HasForeignKey<Payment>(p => p.OrderId);
         
         // Order to Product 1:N - Product-Order 1:N
-        modelBuilder.Entity<Order>()
+        b.Entity<Order>()
             .HasMany(o => o.Products)
             .WithMany(p => p.Orders);
 
+        b.Entity<Account>().HasData(Seed.Accounts.GetAccounts());
+        b.Entity<Product>().HasData(Seed.Products.GetProducts());
     }
 
     public override int SaveChanges()

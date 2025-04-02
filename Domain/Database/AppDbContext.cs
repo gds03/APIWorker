@@ -1,5 +1,6 @@
 using Domain.Database.Entities;
 using Domain.Infrastructure;
+using MassTransit;
 
 namespace Domain.Database;
 
@@ -21,7 +22,6 @@ public class AppDbContext : DbContext
         : base(options)
     {        
     }
-    
     protected override void OnModelCreating(ModelBuilder b)
     {
         //
@@ -57,10 +57,11 @@ public class AppDbContext : DbContext
             .HasValue<CryptoPayment>("Crypto");
         
         //
-        // Seed data
+        // MassTransit Outbox
 
-        b.Entity<Account>().HasData(Seed.Accounts.GetAccounts());
-        b.Entity<Product>().HasData(Seed.Products.GetProducts());
+        b.AddInboxStateEntity(x => x.Metadata.SetTableName("___MassTransit___InboxState"));
+        b.AddOutboxMessageEntity(x => x.Metadata.SetTableName("___MassTransit___OutboxMessage"));
+        b.AddOutboxStateEntity(x => x.Metadata.SetTableName("___MassTransit___OutboxState"));
     }
 
     public override int SaveChanges()

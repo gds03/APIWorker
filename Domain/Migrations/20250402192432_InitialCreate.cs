@@ -4,8 +4,6 @@ using MySql.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace Domain.Migrations
 {
     /// <inheritdoc />
@@ -15,6 +13,49 @@ namespace Domain.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "___MassTransit___InboxState",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    MessageId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    ConsumerId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    LockId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "longblob", rowVersion: true, nullable: true)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.ComputedColumn),
+                    Received = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    ReceiveCount = table.Column<int>(type: "int", nullable: false),
+                    ExpirationTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    Consumed = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    Delivered = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    LastSequenceNumber = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK____MassTransit___InboxState", x => x.Id);
+                    table.UniqueConstraint("AK____MassTransit___InboxState_MessageId_ConsumerId", x => new { x.MessageId, x.ConsumerId });
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "___MassTransit___OutboxState",
+                columns: table => new
+                {
+                    OutboxId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    LockId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "longblob", rowVersion: true, nullable: true)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.ComputedColumn),
+                    Created = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Delivered = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    LastSequenceNumber = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK____MassTransit___OutboxState", x => x.OutboxId);
+                })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -50,6 +91,49 @@ namespace Domain.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "___MassTransit___OutboxMessage",
+                columns: table => new
+                {
+                    SequenceNumber = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    EnqueueTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    SentTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Headers = table.Column<string>(type: "longtext", nullable: true),
+                    Properties = table.Column<string>(type: "longtext", nullable: true),
+                    InboxMessageId = table.Column<Guid>(type: "char(36)", nullable: true),
+                    InboxConsumerId = table.Column<Guid>(type: "char(36)", nullable: true),
+                    OutboxId = table.Column<Guid>(type: "char(36)", nullable: true),
+                    MessageId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    ContentType = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false),
+                    MessageType = table.Column<string>(type: "longtext", nullable: false),
+                    Body = table.Column<string>(type: "longtext", nullable: false),
+                    ConversationId = table.Column<Guid>(type: "char(36)", nullable: true),
+                    CorrelationId = table.Column<Guid>(type: "char(36)", nullable: true),
+                    InitiatorId = table.Column<Guid>(type: "char(36)", nullable: true),
+                    RequestId = table.Column<Guid>(type: "char(36)", nullable: true),
+                    SourceAddress = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
+                    DestinationAddress = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
+                    ResponseAddress = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
+                    FaultAddress = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
+                    ExpirationTime = table.Column<DateTime>(type: "datetime(6)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK____MassTransit___OutboxMessage", x => x.SequenceNumber);
+                    table.ForeignKey(
+                        name: "FK____MassTransit___OutboxMessage____MassTransit___InboxState_I~",
+                        columns: x => new { x.InboxMessageId, x.InboxConsumerId },
+                        principalTable: "___MassTransit___InboxState",
+                        principalColumns: new[] { "MessageId", "ConsumerId" });
+                    table.ForeignKey(
+                        name: "FK____MassTransit___OutboxMessage____MassTransit___OutboxState_~",
+                        column: x => x.OutboxId,
+                        principalTable: "___MassTransit___OutboxState",
+                        principalColumn: "OutboxId");
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
@@ -134,29 +218,37 @@ namespace Domain.Migrations
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
-            migrationBuilder.InsertData(
-                table: "Accounts",
-                columns: new[] { "Id", "CreatedWhenUtc", "Email", "IsActive", "IsVerified" },
-                values: new object[] { "9999-ZYXWVUTS-99", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@admin.com", true, true });
+            migrationBuilder.CreateIndex(
+                name: "IX____MassTransit___InboxState_Delivered",
+                table: "___MassTransit___InboxState",
+                column: "Delivered");
 
-            migrationBuilder.InsertData(
-                table: "Products",
-                columns: new[] { "Id", "CreatedWhenUtc", "Description", "IsDiscontinued", "Name", "Price", "Sku", "StockQuantity" },
-                values: new object[,]
-                {
-                    { 1L, new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5648), "Powerful laptop with Intel Core i7, 16GB RAM, and 512GB SSD.", false, "Dell XPS 15", 1599.99m, "LAPTOP-001", 10L },
-                    { 2L, new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5651), "Apple M2 Pro chip, 16GB RAM, 512GB SSD, Retina Display.", false, "MacBook Pro 14\"", 1999.99m, "LAPTOP-002", 8L },
-                    { 3L, new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5653), "Business laptop with Intel Core i7, 16GB RAM, and 1TB SSD.", false, "Lenovo ThinkPad X1 Carbon", 1899.99m, "LAPTOP-003", 6L },
-                    { 4L, new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5655), "Gaming laptop with AMD Ryzen 9, RTX 4060, and 16GB RAM.", false, "ASUS ROG Zephyrus G14", 1799.99m, "LAPTOP-004", 5L },
-                    { 5L, new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5656), "2-in-1 convertible laptop with OLED display and Intel Core i7.", false, "HP Spectre x360 14", 1699.99m, "LAPTOP-005", 7L },
-                    { 6L, new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5658), "Budget-friendly laptop with AMD Ryzen 7, 16GB RAM, and 512GB SSD.", false, "Acer Swift 3", 799.99m, "LAPTOP-006", 12L },
-                    { 7L, new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5659), "128GB, Space Black, 48MP main camera, A16 Bionic chip.", false, "iPhone 14 Pro", 999.99m, "PHONE-001", 15L },
-                    { 8L, new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5660), "256GB, Phantom Black, 200MP camera, S Pen included.", false, "Samsung Galaxy S23 Ultra", 1199.99m, "PHONE-002", 12L },
-                    { 9L, new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5662), "128GB, Obsidian, Tensor G2 chip, AI-powered camera.", false, "Google Pixel 7 Pro", 899.99m, "PHONE-003", 9L },
-                    { 10L, new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5663), "256GB, Eternal Green, Snapdragon 8 Gen 2, 120Hz AMOLED.", false, "OnePlus 11 5G", 799.99m, "PHONE-004", 11L },
-                    { 11L, new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5665), "256GB, Ceramic Black, 1-inch Sony IMX989 sensor, Leica optics.", false, "Xiaomi 13 Pro", 1099.99m, "PHONE-005", 10L },
-                    { 12L, new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5666), "256GB, Frosted Black, 4K OLED display, 12MP triple camera.", false, "Sony Xperia 1 V", 1199.99m, "PHONE-006", 6L }
-                });
+            migrationBuilder.CreateIndex(
+                name: "IX____MassTransit___OutboxMessage_EnqueueTime",
+                table: "___MassTransit___OutboxMessage",
+                column: "EnqueueTime");
+
+            migrationBuilder.CreateIndex(
+                name: "IX____MassTransit___OutboxMessage_ExpirationTime",
+                table: "___MassTransit___OutboxMessage",
+                column: "ExpirationTime");
+
+            migrationBuilder.CreateIndex(
+                name: "IX____MassTransit___OutboxMessage_InboxMessageId_InboxConsumerI~",
+                table: "___MassTransit___OutboxMessage",
+                columns: new[] { "InboxMessageId", "InboxConsumerId", "SequenceNumber" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX____MassTransit___OutboxMessage_OutboxId_SequenceNumber",
+                table: "___MassTransit___OutboxMessage",
+                columns: new[] { "OutboxId", "SequenceNumber" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX____MassTransit___OutboxState_Created",
+                table: "___MassTransit___OutboxState",
+                column: "Created");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderProduct_ProductsId",
@@ -184,10 +276,19 @@ namespace Domain.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "___MassTransit___OutboxMessage");
+
+            migrationBuilder.DropTable(
                 name: "OrderProduct");
 
             migrationBuilder.DropTable(
                 name: "Payments");
+
+            migrationBuilder.DropTable(
+                name: "___MassTransit___InboxState");
+
+            migrationBuilder.DropTable(
+                name: "___MassTransit___OutboxState");
 
             migrationBuilder.DropTable(
                 name: "Products");

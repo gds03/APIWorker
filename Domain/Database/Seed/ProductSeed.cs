@@ -2,11 +2,9 @@ using Domain.Database.Entities;
 
 namespace Domain.Database.Seed;
 
-public class Products
+public class ProductSeed
 {
-    public static IEnumerable<Product> GetProducts()
-    {
-        return new []
+    public static IEnumerable<Product> Products => new []
         {
             // Laptops
             new Product
@@ -145,4 +143,3 @@ public class Products
             }
         };
     }
-}

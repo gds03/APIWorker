@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Copy solution and project files
 COPY *.sln ./
-COPY Contracts/*.csproj Contracts/
+COPY Events/*.csproj Events/
 COPY Domain/*.csproj Domain/
 COPY Domain.Tests/*.csproj Domain.Tests/
 COPY API/*.csproj API/

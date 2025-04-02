@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Domain.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250402180451_InitialCreate")]
+    [Migration("20250402192432_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -43,16 +43,6 @@ namespace Domain.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Accounts");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "9999-ZYXWVUTS-99",
-                            CreatedWhenUtc = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "admin@admin.com",
-                            IsActive = true,
-                            IsVerified = true
-                        });
                 });
 
             modelBuilder.Entity("Domain.Database.Entities.Order", b =>
@@ -157,140 +147,170 @@ namespace Domain.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Products");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5648),
-                            Description = "Powerful laptop with Intel Core i7, 16GB RAM, and 512GB SSD.",
-                            IsDiscontinued = false,
-                            Name = "Dell XPS 15",
-                            Price = 1599.99m,
-                            Sku = "LAPTOP-001",
-                            StockQuantity = 10L
-                        },
-                        new
-                        {
-                            Id = 2L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5651),
-                            Description = "Apple M2 Pro chip, 16GB RAM, 512GB SSD, Retina Display.",
-                            IsDiscontinued = false,
-                            Name = "MacBook Pro 14\"",
-                            Price = 1999.99m,
-                            Sku = "LAPTOP-002",
-                            StockQuantity = 8L
-                        },
-                        new
-                        {
-                            Id = 3L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5653),
-                            Description = "Business laptop with Intel Core i7, 16GB RAM, and 1TB SSD.",
-                            IsDiscontinued = false,
-                            Name = "Lenovo ThinkPad X1 Carbon",
-                            Price = 1899.99m,
-                            Sku = "LAPTOP-003",
-                            StockQuantity = 6L
-                        },
-                        new
-                        {
-                            Id = 4L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5655),
-                            Description = "Gaming laptop with AMD Ryzen 9, RTX 4060, and 16GB RAM.",
-                            IsDiscontinued = false,
-                            Name = "ASUS ROG Zephyrus G14",
-                            Price = 1799.99m,
-                            Sku = "LAPTOP-004",
-                            StockQuantity = 5L
-                        },
-                        new
-                        {
-                            Id = 5L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5656),
-                            Description = "2-in-1 convertible laptop with OLED display and Intel Core i7.",
-                            IsDiscontinued = false,
-                            Name = "HP Spectre x360 14",
-                            Price = 1699.99m,
-                            Sku = "LAPTOP-005",
-                            StockQuantity = 7L
-                        },
-                        new
-                        {
-                            Id = 6L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5658),
-                            Description = "Budget-friendly laptop with AMD Ryzen 7, 16GB RAM, and 512GB SSD.",
-                            IsDiscontinued = false,
-                            Name = "Acer Swift 3",
-                            Price = 799.99m,
-                            Sku = "LAPTOP-006",
-                            StockQuantity = 12L
-                        },
-                        new
-                        {
-                            Id = 7L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5659),
-                            Description = "128GB, Space Black, 48MP main camera, A16 Bionic chip.",
-                            IsDiscontinued = false,
-                            Name = "iPhone 14 Pro",
-                            Price = 999.99m,
-                            Sku = "PHONE-001",
-                            StockQuantity = 15L
-                        },
-                        new
-                        {
-                            Id = 8L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5660),
-                            Description = "256GB, Phantom Black, 200MP camera, S Pen included.",
-                            IsDiscontinued = false,
-                            Name = "Samsung Galaxy S23 Ultra",
-                            Price = 1199.99m,
-                            Sku = "PHONE-002",
-                            StockQuantity = 12L
-                        },
-                        new
-                        {
-                            Id = 9L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5662),
-                            Description = "128GB, Obsidian, Tensor G2 chip, AI-powered camera.",
-                            IsDiscontinued = false,
-                            Name = "Google Pixel 7 Pro",
-                            Price = 899.99m,
-                            Sku = "PHONE-003",
-                            StockQuantity = 9L
-                        },
-                        new
-                        {
-                            Id = 10L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5663),
-                            Description = "256GB, Eternal Green, Snapdragon 8 Gen 2, 120Hz AMOLED.",
-                            IsDiscontinued = false,
-                            Name = "OnePlus 11 5G",
-                            Price = 799.99m,
-                            Sku = "PHONE-004",
-                            StockQuantity = 11L
-                        },
-                        new
-                        {
-                            Id = 11L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5665),
-                            Description = "256GB, Ceramic Black, 1-inch Sony IMX989 sensor, Leica optics.",
-                            IsDiscontinued = false,
-                            Name = "Xiaomi 13 Pro",
-                            Price = 1099.99m,
-                            Sku = "PHONE-005",
-                            StockQuantity = 10L
-                        },
-                        new
-                        {
-                            Id = 12L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5666),
-                            Description = "256GB, Frosted Black, 4K OLED display, 12MP triple camera.",
-                            IsDiscontinued = false,
-                            Name = "Sony Xperia 1 V",
-                            Price = 1199.99m,
-                            Sku = "PHONE-006",
-                            StockQuantity = 6L
-                        });
+            modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.InboxState", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("Consumed")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("ConsumerId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime?>("Delivered")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("ExpirationTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long?>("LastSequenceNumber")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("LockId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("MessageId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("ReceiveCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Received")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("longblob");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Delivered");
+
+                    b.ToTable("___MassTransit___InboxState");
+                });
+
+            modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.OutboxMessage", b =>
+                {
+                    b.Property<long>("SequenceNumber")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<Guid?>("ConversationId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("CorrelationId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("DestinationAddress")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<DateTime?>("EnqueueTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("ExpirationTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("FaultAddress")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<string>("Headers")
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid?>("InboxConsumerId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("InboxMessageId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("InitiatorId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("MessageId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("MessageType")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid?>("OutboxId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Properties")
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid?>("RequestId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("ResponseAddress")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<DateTime>("SentTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("SourceAddress")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.HasKey("SequenceNumber");
+
+                    b.HasIndex("EnqueueTime");
+
+                    b.HasIndex("ExpirationTime");
+
+                    b.HasIndex("OutboxId", "SequenceNumber")
+                        .IsUnique();
+
+                    b.HasIndex("InboxMessageId", "InboxConsumerId", "SequenceNumber")
+                        .IsUnique();
+
+                    b.ToTable("___MassTransit___OutboxMessage");
+                });
+
+            modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.OutboxState", b =>
+                {
+                    b.Property<Guid>("OutboxId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("Delivered")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long?>("LastSequenceNumber")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("LockId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("longblob");
+
+                    b.HasKey("OutboxId");
+
+                    b.HasIndex("Created");
+
+                    b.ToTable("___MassTransit___OutboxState");
                 });
 
             modelBuilder.Entity("OrderProduct", b =>
@@ -378,6 +398,18 @@ namespace Domain.Migrations
                         .IsRequired();
 
                     b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.OutboxMessage", b =>
+                {
+                    b.HasOne("MassTransit.EntityFrameworkCoreIntegration.OutboxState", null)
+                        .WithMany()
+                        .HasForeignKey("OutboxId");
+
+                    b.HasOne("MassTransit.EntityFrameworkCoreIntegration.InboxState", null)
+                        .WithMany()
+                        .HasForeignKey("InboxMessageId", "InboxConsumerId")
+                        .HasPrincipalKey("MessageId", "ConsumerId");
                 });
 
             modelBuilder.Entity("OrderProduct", b =>

@@ -7,6 +7,7 @@ using Domain.ValueObjects.Account;
 using Domain.ValueObjects.Order;
 using Domain.ValueObjects.Payment;
 using Domain.ValueObjects.Product;
+using Events;
 using FluentResults;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -110,11 +111,11 @@ public class PlaceOrderHandler : IPlaceOrderHandler
             return new Error($"No products were found for SKUs '{string.Join("', '", skus)}'");
         }
         
-        foreach (Product p in products)
+        foreach (Product product in products)
         {
-            if (p.StockQuantity == 0)
+            if (product.StockQuantity == 0)
             {
-                productsValidationErrors.Add(Result.Fail($"Product {p.Sku} has no stock."));
+                productsValidationErrors.Add(Result.Fail($"Product {product.Sku} has no stock."));
             }
         }
         if (productsValidationErrors.Any())
@@ -124,7 +125,7 @@ public class PlaceOrderHandler : IPlaceOrderHandler
         var totalProductPrice = products.Sum(p => _priceHttpClient.GetPriceAsync(p.Sku).Result);
         var orderIdentifier = _orderIdentifierGenerator.Generate();
         
-        var order = new Order
+        var o = new Order
         {
             AccountId = request.AccountId,
             Total = totalProductPrice,
@@ -133,9 +134,9 @@ public class PlaceOrderHandler : IPlaceOrderHandler
             Products = products
         };
         
-        var payment = new CardPayment
+        var p = new CardPayment
         {
-            Order = order,
+            Order = o,
             Status = new PaymentStatus(PaymentStatusEnum.Pending),
             Price = totalProductPrice,
             PaymentType = new PaymentType(PaymentTypeEnum.Card),
@@ -146,11 +147,18 @@ public class PlaceOrderHandler : IPlaceOrderHandler
             Name = request.VisaCard.Owner            
         };
         
-        _dbContext.Orders.Add(order);
-        _dbContext.Payments.Add(payment);
+        OrderPlaced orderPlaced = new(
+            new OrderInfo(o.AccountId, DateTime.UtcNow, o.Identifier, o.Total, o.Status),
+            new PaymentInfo(p.Status, p.PaymentType, p.Price, p.CardNumber, p.Month, p.Year, p.CVV, p.Name)
+        );
+
+        await _bus.Publish(orderPlaced, cancellationToken);
+        
+        _dbContext.Orders.Add(o);
+        _dbContext.Payments.Add(p);
         await _dbContext.SaveChangesAsync(cancellationToken);
         
-        return (orderIdentifier, order.Status);
+        return (orderIdentifier, o.Status);
     }
 }
 

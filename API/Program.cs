@@ -1,11 +1,9 @@
 ﻿// ApiService/Program.cs
 using API.Infrastructure.Extensions;
-using Contracts;
 using Domain.Database;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +21,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMassTransit(x =>
 {
+    x.AddEntityFrameworkOutbox<AppDbContext>(o =>
+    {
+        //o.QueryDelay = TimeSpan.FromDays(1);
+        o.UseMySql();
+        o.UseBusOutbox();
+    });
+    
     x.UsingRabbitMq((context, cfg) =>
     {
         var rabbitHost = configuration["RABBITMQ:Host"] ?? "localhost";
@@ -62,6 +67,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.WebHost.UseUrls("http://0.0.0.0:5000"); // Ensure API listens on all interfaces
 
 var app = builder.Build();
+await app.EnsureDbIsReadyAsync();
 
 // Enable Swagger UI in development
 if (app.Environment.IsDevelopment())
@@ -77,12 +83,5 @@ if (app.Environment.IsDevelopment())
 
 // Minimal API
 app.MapGet("/", () => "API is running").WithName("EntryPoint");
-
-app.MapPost("/send", async (IBus bus) =>
-{
-    await bus.Publish(new SendMessage { Time = TimeOnly.FromDateTime(DateTime.UtcNow).ToString("HH:mm:ss") });
-    return Results.Ok("Message sent!");
-}).WithName("Send");;
-
 app.MapControllers();
 await app.RunAsync();

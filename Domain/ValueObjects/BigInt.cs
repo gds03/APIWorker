@@ -1,4 +1,3 @@
-using Domain.Infrastructure;
 using FluentResults;
 
 namespace Domain.ValueObjects;
@@ -15,11 +14,11 @@ public readonly record struct BigInt
 
     public static Result<BigInt> Create(long value)
     {
-        ResultBuilder<BigInt> builder = new();
+        if (value < 1)
+        {
+            return Result.Fail<BigInt>($"BigInt cannot empty.");
+        }
 
-        if (value < 1 )
-            builder.Error("BoundedInt cannot be lower than 1");
-        
-        return builder.Build(() => new BigInt(value));
+        return Result.Ok(new BigInt(value));
     }
 }

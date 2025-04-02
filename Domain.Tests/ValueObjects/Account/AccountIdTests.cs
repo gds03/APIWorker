@@ -43,7 +43,7 @@ public class AccountIdTests
 
         // Assert
         Assert.True(result.IsFailed);
-        Assert.Contains(result.Errors, e => e.Message == "Invalid format. Expected format: 1234-ABCDEFGH-12.");
+        Assert.Contains(result.Errors, e => e.Message == "Invalid format. Expected format: 1234-ABCDEFGH-12");
     }
 
     [Fact]

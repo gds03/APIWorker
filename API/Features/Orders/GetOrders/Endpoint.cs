@@ -4,9 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Features.Orders.GetOrders;
 
-public record GetAllResponse(List<GetOrdersHandlerOrderResponse> Orders) : ApiResponse;
-
-
 [ApiController]
 [Route("api/orders")]
 public class GetOrdersEndpoint : Controller
@@ -37,3 +34,5 @@ public class GetOrdersEndpoint : Controller
         });
     }
 }
+
+public record GetAllResponse(List<GetOrdersHandlerOrderResponse> Orders) : ApiResponse;

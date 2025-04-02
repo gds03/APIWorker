@@ -30,7 +30,7 @@ public class BigIntTests
 
         // Assert
         Assert.False(result.IsSuccess);
-        Assert.Contains("BoundedInt cannot be empty.", result.Errors[0].Message);
+        Assert.Contains("BigInt cannot empty.", result.Errors[0].Message);
     }
 
     [Fact]

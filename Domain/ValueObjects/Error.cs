@@ -12,6 +12,8 @@ public readonly record struct Error
         
         Value = errorMessage;
     }
+    
+    public static implicit operator Error(string errorMessage) => new Error(errorMessage);
     public static implicit operator string(Error errorMessage) => errorMessage.Value;
     public override string ToString() => Value;
 }

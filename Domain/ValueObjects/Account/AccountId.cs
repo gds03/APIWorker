@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using Domain.Infrastructure;
 using FluentResults;
 
 namespace Domain.ValueObjects.Account;
@@ -17,14 +16,16 @@ public readonly record struct AccountId
 
     public static Result<AccountId> Create(string? value)
     {
-        ResultBuilder<AccountId> builder = new();
+        List<Error> errors = [];
 
         if (string.IsNullOrWhiteSpace(value))
-            builder.Error("AccountId cannot be empty.");
+            errors.Add("AccountId cannot be empty.");
 
         else if (!Pattern.IsMatch(value))
-            builder.Error("Invalid format. Expected format: 1234-ABCDEFGH-12");
+            errors.Add("Invalid format. Expected format: 1234-ABCDEFGH-12");
 
-        return builder.Build(()=> new AccountId(value));
+        return errors.Any()
+            ? Result.Fail<AccountId>(errors.Select(e => e.ToString()))
+            : Result.Ok(new AccountId(value!));
     }
 }

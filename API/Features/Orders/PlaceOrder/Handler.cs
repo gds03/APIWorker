@@ -1,3 +1,4 @@
+using API.Features._Shared.Handlers;
 using API.HttpClients;
 using API.Infrastructure;
 using Domain.Database;
@@ -21,7 +22,11 @@ public class PlaceOrderHandlerRequest
     public AccountId AccountId { get; private set; }
     public IEnumerable<(Sku sku, BigInt amount)> Products{ get; private set; } = null!;
 
-    public static Result<PlaceOrderHandlerRequest> Create(string? accountId, IEnumerable<(string? sku, int amount)> products)
+    public static Result<PlaceOrderHandlerRequest> Create(
+        string? accountId, 
+        IEnumerable<(string? sku, int amount)> products,
+        VisaCardPaymentRequest visaCardPaymentRequest
+        )
     {
         List<Result> results = [];
         Result<AccountId> voAccountId = AccountId.Create(accountId);

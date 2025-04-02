@@ -8,7 +8,7 @@ public readonly record struct AccountId
     private static readonly Regex Pattern = new(@"^\d{4}-[A-Za-z]{8}-\d{2}$", RegexOptions.Compiled);
     
     public string Value { get; }
-
+    
     private AccountId(string value) => Value = value;
     
     public static implicit operator string(AccountId accountId) => accountId.Value;

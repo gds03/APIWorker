@@ -21,13 +21,12 @@ public class PlaceOrderHandlerRequest
 
     public AccountId AccountId { get; private set; }
     public IEnumerable<(Sku sku, BigInt amount)> Products{ get; private set; } = null!;
-
     public VisaCard VisaCard { get; private set; }
 
     public static Result<PlaceOrderHandlerRequest> Create(
         string? accountId, 
         IEnumerable<(string? sku, int amount)> products,
-        (string? cardNumber, int expirationMonth, int expirationYear, int cvv) visaCard
+        (string? owner, string? cardNumber, int expirationMonth, int expirationYear, int cvv) visaCard
         )
     {
         List<Result> results = [];
@@ -50,7 +49,7 @@ public class PlaceOrderHandlerRequest
         }
         
         // VISA
-        var voVisaCard = VisaCard.Create(visaCard.cardNumber, visaCard.expirationMonth, visaCard.expirationYear,
+        var voVisaCard = VisaCard.Create(visaCard.owner, visaCard.cardNumber, visaCard.expirationMonth, visaCard.expirationYear,
             visaCard.cvv);
         results.Add(voVisaCard.ToResult());
         
@@ -70,7 +69,7 @@ public class PlaceOrderHandlerRequest
 }
 public interface IPlaceOrderHandler : IHandler
 {
-    Task<OneOf<(BigInt orderId, OrderStatus orderStatus), Error>> HandleAsync(PlaceOrderHandlerRequest request, CancellationToken cancellationToken);
+    Task<OneOf<(OrderIdentifier identifier, OrderStatus orderStatus), Error>> HandleAsync(PlaceOrderHandlerRequest request, CancellationToken cancellationToken);
 }
 
 public class PlaceOrderHandler : IPlaceOrderHandler
@@ -96,7 +95,7 @@ public class PlaceOrderHandler : IPlaceOrderHandler
         _orderIdentifierGenerator = orderIdentifierGenerator;
     }
 
-    public async Task<OneOf<(BigInt orderId, OrderStatus orderStatus), Error>> HandleAsync(PlaceOrderHandlerRequest request, CancellationToken cancellationToken)
+    public async Task<OneOf<(OrderIdentifier identifier, OrderStatus orderStatus), Error>> HandleAsync(PlaceOrderHandlerRequest request, CancellationToken cancellationToken)
     {
         // Outbox pattern now.
         var skus = request.Products.Select(x => x.sku.ToString()).ToArray();
@@ -105,6 +104,12 @@ public class PlaceOrderHandler : IPlaceOrderHandler
         var products = await _dbContext.Products
             .Where(p => skus.Contains(p.Sku))
             .ToArrayAsync(cancellationToken);
+
+        if (!products.Any())
+        {
+            return new Error($"No products were found for SKUs '{string.Join("', '", skus)}'");
+        }
+        
         foreach (Product p in products)
         {
             if (p.StockQuantity == 0)
@@ -116,28 +121,36 @@ public class PlaceOrderHandler : IPlaceOrderHandler
         {
             return new Error(string.Join(Environment.NewLine, Result.Merge(productsValidationErrors.ToResult()).Errors.Select(x => x.Message)));
         }
-
-        var payment = new CardPayment
-        {
-            CardNumber = request.VisaCard.CardNumber,
-            Month = request.VisaCard.ExpirationMonth,
-            Year = request.VisaCard.ExpirationYear,
-            CVV = request.VisaCard.Cvv,
-            //Name = request.VisaCard.Name
-        };
-
         var totalProductPrice = products.Sum(p => _priceHttpClient.GetPriceAsync(p.Sku).Result);
-        var orderGenId = _orderIdentifierGenerator.Generate();
+        var orderIdentifier = _orderIdentifierGenerator.Generate();
+        
         var order = new Order
         {
             AccountId = request.AccountId,
             Total = totalProductPrice,
             Status = new OrderStatus(OrderStatusEnum.WaitingForPayment),
-            Identifier = orderGenId,
+            Identifier = orderIdentifier,
             Products = products
         };
         
-        return (order.Id, order.Status);
+        var payment = new CardPayment
+        {
+            Order = order,
+            Status = new PaymentStatus(PaymentStatusEnum.Pending),
+            Price = totalProductPrice,
+            PaymentType = new PaymentType(PaymentTypeEnum.Card),
+            CardNumber = request.VisaCard.CardNumber,
+            Month = request.VisaCard.ExpirationMonth,
+            Year = request.VisaCard.ExpirationYear,
+            CVV = request.VisaCard.Cvv,
+            Name = request.VisaCard.Owner            
+        };
+        
+        _dbContext.Orders.Add(order);
+        _dbContext.Payments.Add(payment);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        
+        return (orderIdentifier, order.Status);
     }
 }
 

@@ -4,13 +4,15 @@ namespace Domain.ValueObjects.Payment;
 
 public readonly record struct VisaCard
 {
+    public string Owner { get; }
     public string CardNumber { get; }
     public int ExpirationMonth { get; }
     public int ExpirationYear { get; }
     public int Cvv { get; }
 
-    private VisaCard(string cardNumber, int expirationMonth, int expirationYear, int cvv)
+    private VisaCard(string owner, string cardNumber, int expirationMonth, int expirationYear, int cvv)
     {
+        Owner = owner;
         CardNumber = cardNumber;
         ExpirationMonth = expirationMonth;
         ExpirationYear = expirationYear;
@@ -21,41 +23,31 @@ public readonly record struct VisaCard
 
     public override string ToString() => CardNumber;
 
-    public static Result<VisaCard> Create(string? cardNumber, int? expirationMonth, int? expirationYear, int? cvv)
+    public static Result<VisaCard> Create(string? owner, string? cardNumber, int? expirationMonth, int? expirationYear, int? cvv)
     {
         List<Error> errors = new();
         if (!expirationMonth.HasValue || !expirationYear.HasValue || !IsValidExpiration(expirationMonth.Value, expirationYear.Value))
-        {
             errors.Add("Expiration date is invalid.");
-        }
         
         if (cvv is null or < 1 or > 999)
-        {
             errors.Add("CVV code is invalid.");
-        }
+
+        if (string.IsNullOrWhiteSpace(owner))
+            errors.Add("Owner is required.");
         
         if (string.IsNullOrWhiteSpace(cardNumber))
-        {
             errors.Add("number cannot be empty.");
-        }        
         
         // Check if the card starts with '4' and has a valid length (13 to 19 digits)
         if (!string.IsNullOrWhiteSpace(cardNumber) && (!cardNumber.StartsWith("4") || cardNumber.Length < 13 || cardNumber.Length > 19))
-        {
             errors.Add("number isn't valid for a visa card.");
-        }       
 
         if (!string.IsNullOrWhiteSpace(cardNumber) && !IsLuhnValid(cardNumber))
-        {
             errors.Add("number is not valid");
-        }
-
-        if (errors.Any())
-        {
-            return Result.Fail<VisaCard>(errors.Select(e => e.ToString()));
-        }
-
-        return Result.Ok(new VisaCard(cardNumber!, expirationMonth!.Value, expirationYear!.Value, cvv!.Value));
+        
+        return errors.Any()
+            ? Result.Fail<VisaCard>(errors.Select(e => e.ToString()))
+            : Result.Ok(new VisaCard(owner!, cardNumber!, expirationMonth!.Value, expirationYear!.Value, cvv!.Value));
     }
     
     private static bool IsValidExpiration(int cardMonth, int cardYear)

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Domain.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250402120251_InitialCreate")]
+    [Migration("20250402180451_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -70,7 +70,7 @@ namespace Domain.Migrations
 
                     b.Property<string>("Identifier")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -82,6 +82,8 @@ namespace Domain.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AccountId");
+
+                    b.HasIndex("Identifier");
 
                     b.ToTable("Orders");
                 });
@@ -160,7 +162,7 @@ namespace Domain.Migrations
                         new
                         {
                             Id = 1L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 12, 2, 50, 614, DateTimeKind.Utc).AddTicks(8112),
+                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5648),
                             Description = "Powerful laptop with Intel Core i7, 16GB RAM, and 512GB SSD.",
                             IsDiscontinued = false,
                             Name = "Dell XPS 15",
@@ -171,7 +173,7 @@ namespace Domain.Migrations
                         new
                         {
                             Id = 2L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 12, 2, 50, 614, DateTimeKind.Utc).AddTicks(8117),
+                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5651),
                             Description = "Apple M2 Pro chip, 16GB RAM, 512GB SSD, Retina Display.",
                             IsDiscontinued = false,
                             Name = "MacBook Pro 14\"",
@@ -182,7 +184,7 @@ namespace Domain.Migrations
                         new
                         {
                             Id = 3L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 12, 2, 50, 614, DateTimeKind.Utc).AddTicks(8119),
+                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5653),
                             Description = "Business laptop with Intel Core i7, 16GB RAM, and 1TB SSD.",
                             IsDiscontinued = false,
                             Name = "Lenovo ThinkPad X1 Carbon",
@@ -193,7 +195,7 @@ namespace Domain.Migrations
                         new
                         {
                             Id = 4L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 12, 2, 50, 614, DateTimeKind.Utc).AddTicks(8120),
+                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5655),
                             Description = "Gaming laptop with AMD Ryzen 9, RTX 4060, and 16GB RAM.",
                             IsDiscontinued = false,
                             Name = "ASUS ROG Zephyrus G14",
@@ -204,7 +206,7 @@ namespace Domain.Migrations
                         new
                         {
                             Id = 5L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 12, 2, 50, 614, DateTimeKind.Utc).AddTicks(8122),
+                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5656),
                             Description = "2-in-1 convertible laptop with OLED display and Intel Core i7.",
                             IsDiscontinued = false,
                             Name = "HP Spectre x360 14",
@@ -215,7 +217,7 @@ namespace Domain.Migrations
                         new
                         {
                             Id = 6L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 12, 2, 50, 614, DateTimeKind.Utc).AddTicks(8124),
+                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5658),
                             Description = "Budget-friendly laptop with AMD Ryzen 7, 16GB RAM, and 512GB SSD.",
                             IsDiscontinued = false,
                             Name = "Acer Swift 3",
@@ -226,7 +228,7 @@ namespace Domain.Migrations
                         new
                         {
                             Id = 7L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 12, 2, 50, 614, DateTimeKind.Utc).AddTicks(8126),
+                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5659),
                             Description = "128GB, Space Black, 48MP main camera, A16 Bionic chip.",
                             IsDiscontinued = false,
                             Name = "iPhone 14 Pro",
@@ -237,7 +239,7 @@ namespace Domain.Migrations
                         new
                         {
                             Id = 8L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 12, 2, 50, 614, DateTimeKind.Utc).AddTicks(8128),
+                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5660),
                             Description = "256GB, Phantom Black, 200MP camera, S Pen included.",
                             IsDiscontinued = false,
                             Name = "Samsung Galaxy S23 Ultra",
@@ -248,7 +250,7 @@ namespace Domain.Migrations
                         new
                         {
                             Id = 9L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 12, 2, 50, 614, DateTimeKind.Utc).AddTicks(8130),
+                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5662),
                             Description = "128GB, Obsidian, Tensor G2 chip, AI-powered camera.",
                             IsDiscontinued = false,
                             Name = "Google Pixel 7 Pro",
@@ -259,7 +261,7 @@ namespace Domain.Migrations
                         new
                         {
                             Id = 10L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 12, 2, 50, 614, DateTimeKind.Utc).AddTicks(8132),
+                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5663),
                             Description = "256GB, Eternal Green, Snapdragon 8 Gen 2, 120Hz AMOLED.",
                             IsDiscontinued = false,
                             Name = "OnePlus 11 5G",
@@ -270,7 +272,7 @@ namespace Domain.Migrations
                         new
                         {
                             Id = 11L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 12, 2, 50, 614, DateTimeKind.Utc).AddTicks(8134),
+                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5665),
                             Description = "256GB, Ceramic Black, 1-inch Sony IMX989 sensor, Leica optics.",
                             IsDiscontinued = false,
                             Name = "Xiaomi 13 Pro",
@@ -281,7 +283,7 @@ namespace Domain.Migrations
                         new
                         {
                             Id = 12L,
-                            CreatedWhenUtc = new DateTime(2025, 4, 2, 12, 2, 50, 614, DateTimeKind.Utc).AddTicks(8136),
+                            CreatedWhenUtc = new DateTime(2025, 4, 2, 18, 4, 51, 418, DateTimeKind.Utc).AddTicks(5666),
                             Description = "256GB, Frosted Black, 4K OLED display, 12MP triple camera.",
                             IsDiscontinued = false,
                             Name = "Sony Xperia 1 V",

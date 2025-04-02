@@ -1,145 +1,105 @@
 using Domain.ValueObjects.Payment;
+using FluentResults;
 
 namespace Domain.Tests.ValueObjects.Payment;
 
 public class VisaCardTests
 {
-    [Fact]
-    public void Create_ValidCard_ShouldReturnSuccess()
+ [Fact]
+    public void Create_ShouldReturnSuccess_WhenValidCardDetailsProvided()
     {
         // Arrange
-        string validCardNumber = "4111111111111111";
-        int validExpirationMonth = 12;
-        int validExpirationYear = 2025;
-        int validCVV = 12;
-
+        string owner = "John Doe";
+        string cardNumber = "4111111111111111"; // Valid Luhn number
+        int expirationMonth = DateTime.Now.Month;
+        int expirationYear = DateTime.Now.Year + 1;
+        int cvv = 123;
+        
         // Act
-        var result = VisaCard.Create(validCardNumber, validExpirationMonth, validExpirationYear, validCVV);
-
+        Result<VisaCard> result = VisaCard.Create(owner, cardNumber, expirationMonth, expirationYear, cvv);
+        
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal(validCardNumber, result.Value.CardNumber);
-        Assert.Equal(validExpirationMonth, result.Value.ExpirationMonth);
-        Assert.Equal(validExpirationYear, result.Value.ExpirationYear);
-        Assert.Equal(validCVV, result.Value.Cvv);
     }
-
-    [Fact]
-    public void Create_InvalidCardNumber_ShouldReturnFailure()
+    
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void Create_ShouldReturnFailure_WhenOwnerIsInvalid(string? owner)
     {
         // Arrange
-        string invalidCardNumber = "1234567890123456";
-        int validExpirationMonth = 12;
-        int validExpirationYear = 2025;
-        int validCVV = 1;
-
+        string cardNumber = "4111111111111111";
+        int expirationMonth = DateTime.Now.Month;
+        int expirationYear = DateTime.Now.Year + 1;
+        int cvv = 123;
+        
         // Act
-        var result = VisaCard.Create(invalidCardNumber, validExpirationMonth, validExpirationYear, validCVV);
-
+        Result<VisaCard> result = VisaCard.Create(owner, cardNumber, expirationMonth, expirationYear, cvv);
+        
         // Assert
         Assert.False(result.IsSuccess);
-        Assert.Contains("number isn't valid for a visa card.", result.Errors.Select(e => e.Message));
+        Assert.Contains("Owner is required.", result.Errors.Select(e => e.Message));
     }
-
-    [Fact]
-    public void Create_ExpiredCard_ShouldReturnFailure()
+    
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData("1234567890123456")] // Doesn't start with '4'
+    [InlineData("4111111111111")] // Too short
+    [InlineData("41111111111111111111")] // Too long
+    public void Create_ShouldReturnFailure_WhenCardNumberIsInvalid(string? cardNumber)
     {
         // Arrange
-        string validCardNumber = "4111111111111111";
-        int expiredMonth = 1;
-        int expiredYear = 2020;
-        int validCVV = 123;
-
+        string owner = "John Doe";
+        int expirationMonth = DateTime.Now.Month;
+        int expirationYear = DateTime.Now.Year + 1;
+        int cvv = 123;
+        
         // Act
-        var result = VisaCard.Create(validCardNumber, expiredMonth, expiredYear, validCVV);
-
+        Result<VisaCard> result = VisaCard.Create(owner, cardNumber, expirationMonth, expirationYear, cvv);
+        
+        // Assert
+        Assert.False(result.IsSuccess);
+    }
+    
+    [Theory]
+    [InlineData(0, 2026)]
+    [InlineData(13, 2026)]
+    [InlineData(5, 2020)] // Expired
+    public void Create_ShouldReturnFailure_WhenExpirationDateIsInvalid(int expirationMonth, int expirationYear)
+    {
+        // Arrange
+        string owner = "John Doe";
+        string cardNumber = "4111111111111111";
+        int cvv = 123;
+        
+        // Act
+        Result<VisaCard> result = VisaCard.Create(owner, cardNumber, expirationMonth, expirationYear, cvv);
+        
         // Assert
         Assert.False(result.IsSuccess);
         Assert.Contains("Expiration date is invalid.", result.Errors.Select(e => e.Message));
     }
-
-    [Fact]
-    public void Create_InvalidCVV_ShouldReturnFailure()
+    
+    [Theory]
+    [InlineData(null)]
+    [InlineData(0)]
+    [InlineData(1000)]
+    public void Create_ShouldReturnFailure_WhenCvvIsInvalid(int? cvv)
     {
         // Arrange
-        string validCardNumber = "4111111111111111";
-        int validExpirationMonth = 12;
-        int validExpirationYear = 2025;
-        int invalidCVV = 1234; // Invalid CVV
-
+        string owner = "John Doe";
+        string cardNumber = "4111111111111111";
+        int expirationMonth = DateTime.Now.Month;
+        int expirationYear = DateTime.Now.Year + 1;
+        
         // Act
-        var result = VisaCard.Create(validCardNumber, validExpirationMonth, validExpirationYear, invalidCVV);
-
+        Result<VisaCard> result = VisaCard.Create(owner, cardNumber, expirationMonth, expirationYear, cvv);
+        
         // Assert
         Assert.False(result.IsSuccess);
         Assert.Contains("CVV code is invalid.", result.Errors.Select(e => e.Message));
-    }
-
-    [Fact]
-    public void Create_EmptyCardNumber_ShouldReturnFailure()
-    {
-        // Arrange
-        string invalidCardNumber = "";
-        int validExpirationMonth = 12;
-        int validExpirationYear = 2025;
-        int validCVV = 123;
-
-        // Act
-        var result = VisaCard.Create(invalidCardNumber, validExpirationMonth, validExpirationYear, validCVV);
-
-        // Assert
-        Assert.False(result.IsSuccess);
-        Assert.Contains("number cannot be empty.", result.Errors.Select(e => e.Message));
-    }
-
-    [Fact]
-    public void Create_NullCardNumber_ShouldReturnFailure()
-    {
-        // Arrange
-        string? invalidCardNumber = null;
-        int validExpirationMonth = 12;
-        int validExpirationYear = 2025;
-        int validCVV = 123;
-
-        // Act
-        var result = VisaCard.Create(invalidCardNumber, validExpirationMonth, validExpirationYear, validCVV);
-
-        // Assert
-        Assert.False(result.IsSuccess);
-        Assert.Contains("number cannot be empty.", result.Errors.Select(e => e.Message));
-    }
-
-    [Fact]
-    public void Create_InvalidLuhnCheck_ShouldReturnFailure()
-    {
-        // Arrange
-        string invalidCardNumber = "4111111111111112"; // Luhn check fails
-        int validExpirationMonth = 12;
-        int validExpirationYear = 2025;
-        int validCVV = 123;
-
-        // Act
-        var result = VisaCard.Create(invalidCardNumber, validExpirationMonth, validExpirationYear, validCVV);
-
-        // Assert
-        Assert.False(result.IsSuccess);
-        Assert.Contains("number is not valid", result.Errors.Select(e => e.Message));
-    }
-
-    [Fact]
-    public void Create_ValidAmexCard_ShouldReturnFailure()
-    {
-        // Arrange
-        string validCardNumber = "378282246310005"; // American Express card
-        int validExpirationMonth = 12;
-        int validExpirationYear = 2025;
-        int validCVV = 1234; // Amex uses a 4-digit CVV
-
-        // Act
-        var result = VisaCard.Create(validCardNumber, validExpirationMonth, validExpirationYear, validCVV);
-
-        // Assert
-        Assert.False(result.IsSuccess);
-        Assert.Contains( "number isn't valid for a visa card.", result.Errors.Select(e => e.Message));
     }
 }

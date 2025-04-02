@@ -1,6 +1,8 @@
+using Domain.Infrastructure;
+
 namespace Domain.Database.Entities;
 
-public class Product
+public class Product : ICreatedWhenUtc
 {
     public long Id { get; set; }
     public bool IsDiscontinued { get; set; }

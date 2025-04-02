@@ -1,7 +1,9 @@
 
+using Domain.Infrastructure;
+
 namespace Domain.Database.Entities;
 
-public class Order
+public class Order : ICreatedWhenUtc
 {
     public long Id { get; set; }
     public string AccountId { get; set; } public Account Account { get; set; } 

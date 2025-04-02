@@ -1,15 +1,17 @@
+using Domain.ValueObjects.Order;
+
 namespace API.Features.Orders.PlaceOrder;
 
 public interface IOrderIdentifierGenerator
 {
-    string Generate();
+    OrderIdentifier Generate();
 }
 
 public class OrderIdentifierGenerator : IOrderIdentifierGenerator
 {
     private static Random random = new();
     
-    public string Generate()
+    public OrderIdentifier Generate()
     {
         int regionId = random.Next(100, 999); 
 
@@ -19,6 +21,7 @@ public class OrderIdentifierGenerator : IOrderIdentifierGenerator
         // Generate a random unique sequence (7 digits)
         int randomPart = random.Next(1000000, 9999999); 
 
-        return $"{regionId}-{timestampPart}-{randomPart}";
+        string id = $"{regionId}-{timestampPart}-{randomPart}";
+        return OrderIdentifier.Create(id).Value;
     }
 }

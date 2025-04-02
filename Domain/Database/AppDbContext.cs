@@ -1,4 +1,5 @@
 using Domain.Database.Entities;
+using Domain.Infrastructure;
 
 namespace Domain.Database;
 
@@ -20,10 +21,12 @@ public class AppDbContext : DbContext
         : base(options)
     {        
     }
-
+    
     protected override void OnModelCreating(ModelBuilder b)
     {
+        //
         // Orders
+        
         // Order-Account 1:1 - Account-Order:1-N
         b.Entity<Order>()
             .HasOne(o => o.Account)
@@ -40,14 +43,21 @@ public class AppDbContext : DbContext
         b.Entity<Order>()
             .HasMany(o => o.Products)
             .WithMany(p => p.Orders);
+
+        b.Entity<Order>()
+            .HasIndex(o => o.Identifier);
         
-        
+        //
         // Payment
+        
         b.Entity<Payment>()
             .HasDiscriminator<string>("PaymentType")
             .HasValue<CardPayment>("Card")
             .HasValue<PayPalPayment>("PayPal")
             .HasValue<CryptoPayment>("Crypto");
+        
+        //
+        // Seed data
 
         b.Entity<Account>().HasData(Seed.Accounts.GetAccounts());
         b.Entity<Product>().HasData(Seed.Products.GetProducts());
@@ -55,14 +65,25 @@ public class AppDbContext : DbContext
 
     public override int SaveChanges()
     {
-        foreach (var entry in ChangeTracker.Entries())
-        {
-            if (entry.State == EntityState.Added && entry.Property("CreatedWhenUtc") != null)
-            {
-                entry.Property("CreatedWhenUtc").CurrentValue = DateTime.UtcNow;
-            }
-        }
+        SetCreatedWhenUtc();
 
         return base.SaveChanges();
+    }
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        SetCreatedWhenUtc();
+
+        return await base.SaveChangesAsync(cancellationToken);
+    }
+    private void SetCreatedWhenUtc()
+    {
+        foreach (var entry in ChangeTracker.Entries())
+        {
+            string propertyName = nameof(ICreatedWhenUtc.CreatedWhenUtc);
+            if (entry.State == EntityState.Added && entry.Entity is ICreatedWhenUtc createdWhenUtc && createdWhenUtc.CreatedWhenUtc == default)
+            {
+                createdWhenUtc.CreatedWhenUtc = DateTime.UtcNow;
+            }
+        }
     }
 }

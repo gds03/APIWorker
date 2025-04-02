@@ -1,6 +1,8 @@
+using Domain.Infrastructure;
+
 namespace Domain.Database.Entities;
 
-public class Account
+public class Account : ICreatedWhenUtc
 {
     public string Id { get; set; }
     public bool IsActive { get; set; }

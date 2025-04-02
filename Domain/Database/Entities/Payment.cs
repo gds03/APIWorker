@@ -1,6 +1,8 @@
+using Domain.Infrastructure;
+
 namespace Domain.Database.Entities;
 
-public abstract class Payment
+public abstract class Payment : ICreatedWhenUtc
 {
     public long Id { get; set; }
     public long OrderId { get; set; } public Order Order { get; set; } 

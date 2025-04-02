@@ -3,6 +3,7 @@ using API.Features.Orders.GetOrders;
 using API.Infrastructure.Hypermedia;
 using Domain.ValueObjects;
 using Domain.ValueObjects.Order;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OneOf;
 
@@ -25,7 +26,7 @@ public class PlaceOrderEndpoint : Controller
         var handlerRequest = PlaceOrderHandlerRequest.Create(
             accountId, 
             request.Products.Select(p => (p.Sku, p.Amount)),
-            (request.VisaPayment.CardNumber, request.VisaPayment.ExpirationMonth, request.VisaPayment.ExpirationYear, request.VisaPayment.Cvv)
+            (request.VisaPayment.Owner, request.VisaPayment.CardNumber, request.VisaPayment.ExpirationMonth, request.VisaPayment.ExpirationYear, request.VisaPayment.Cvv)
         );
         
         if (handlerRequest.IsFailed)
@@ -33,15 +34,21 @@ public class PlaceOrderEndpoint : Controller
             return BadRequest(handlerRequest.Errors);
         }
 
-        OneOf<(BigInt orderId, OrderStatus orderStatus), Error> result = await _placeOrderHandler.HandleAsync(handlerRequest.Value, ct);
+        OneOf<(OrderIdentifier identifier, OrderStatus orderStatus), Error> result = await _placeOrderHandler.HandleAsync(handlerRequest.Value, ct);
         if (result.IsT1)
         {
-            return BadRequest(result.AsT1);
+            return BadRequest(new ProblemDetails
+            {
+                Title = "Invalid Request",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = result.AsT1.ToString(),
+                Instance = HttpContext.Request.Path
+            });
         }
 
         var handlerResponse = result.AsT0;
         
-        PlaceOrderResponse orderResponse = new(handlerResponse.orderId, handlerResponse.orderStatus);
+        PlaceOrderResponse orderResponse = new(handlerResponse.identifier, handlerResponse.orderStatus);
         orderResponse.Description = "Order placed successfully";
         orderResponse.Operations.Add(
             new Operation("GetOrders", HttpMethod.Get, Url.Action(nameof(GetOrdersEndpoint.GetAllAsync), nameof(GetOrdersEndpoint), new { accountId = accountId }))
@@ -56,4 +63,4 @@ public class PlaceOrderRequest
     public VisaCardPaymentRequest VisaPayment { get; set; }
     public List<ProductAmountRequest> Products { get; set; } = [];
 }
-public record PlaceOrderResponse(long OrderIdentifier, string OrderStatus) : ApiResponse;
+public record PlaceOrderResponse(string OrderIdentifier, string OrderStatus) : ApiResponse;

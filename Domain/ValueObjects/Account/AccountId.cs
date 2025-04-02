@@ -11,6 +11,9 @@ public readonly record struct AccountId
     public string Value { get; }
 
     private AccountId(string value) => Value = value;
+    
+    public static implicit operator string(AccountId accountId) => accountId.Value;
+    public override string ToString() => Value;
 
     public static Result<AccountId> Create(string? value)
     {
@@ -24,7 +27,4 @@ public readonly record struct AccountId
 
         return builder.Build(()=> new AccountId(value));
     }
-
-    public static implicit operator string(AccountId accountId) => accountId.Value;
-    public override string ToString() => Value;
 }

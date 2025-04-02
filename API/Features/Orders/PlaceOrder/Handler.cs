@@ -85,10 +85,12 @@ public class PlaceOrderHandler : IPlaceOrderHandler
     public async Task<OneOf<(BigInt orderId, OrderStatus orderStatus), Error>> HandleAsync(PlaceOrderHandlerRequest request, CancellationToken cancellationToken)
     {
         // Outbox pattern now.
-        var skus = request.Products.Select(x => x.sku).ToArray();
+        var skus = request.Products.Select(x => x.sku.ToString()).ToArray();
 
         var productsValidationErrors = new List<Result>();
-        var products = await _dbContext.Products.Where(p => skus.Any(sku => sku == p.Sku)).ToArrayAsync(cancellationToken);
+        var products = await _dbContext.Products
+            .Where(p => skus.Contains(p.Sku))
+            .ToArrayAsync(cancellationToken);
         foreach (Product p in products)
         {
             if (p.StockQuantity == 0)
@@ -110,10 +112,10 @@ public class PlaceOrderHandler : IPlaceOrderHandler
             Status = new OrderStatus(OrderStatusEnum.WaitingForPayment),
             Identifier = orderGenId,
             Products = products,
-            // Payment = new Payment
-            // {
-            //     
-            // }
+            Payment = new CardPayment()
+            {
+                
+            }
         };
         
         return (order.Id, order.Status);
